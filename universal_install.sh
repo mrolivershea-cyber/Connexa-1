@@ -549,27 +549,20 @@ fi
 if [ -f "$INSTALL_DIR/frontend/.env" ]; then
     print_success "Frontend .env найден"
     
+    # ВСЕГДА обновляем на правильный IP сервера
+    print_warning "Обновляем REACT_APP_BACKEND_URL на http://$SERVER_IP:8001..."
+    
     if grep -q "REACT_APP_BACKEND_URL" "$INSTALL_DIR/frontend/.env"; then
-        BACKEND_URL=$(grep REACT_APP_BACKEND_URL "$INSTALL_DIR/frontend/.env" | cut -d'=' -f2)
-        print_info "Текущий REACT_APP_BACKEND_URL = $BACKEND_URL"
-        
-        # АВТОМАТИЧЕСКИ ОБНОВИТЬ НА ПРАВИЛЬНЫЙ URL
-        if [[ "$BACKEND_URL" != "http://$SERVER_IP:8001" ]]; then
-            print_warning "REACT_APP_BACKEND_URL неправильный, обновляем..."
-            sed -i "s|REACT_APP_BACKEND_URL=.*|REACT_APP_BACKEND_URL=http://$SERVER_IP:8001|g" "$INSTALL_DIR/frontend/.env"
-            print_success "REACT_APP_BACKEND_URL обновлён на http://$SERVER_IP:8001"
-        else
-            print_success "REACT_APP_BACKEND_URL уже правильный"
-        fi
+        sed -i "s|REACT_APP_BACKEND_URL=.*|REACT_APP_BACKEND_URL=http://$SERVER_IP:8001/api|g" "$INSTALL_DIR/frontend/.env"
     else
-        print_warning "REACT_APP_BACKEND_URL не найден, добавляем..."
-        echo "REACT_APP_BACKEND_URL=http://$SERVER_IP:8001" >> "$INSTALL_DIR/frontend/.env"
-        print_success "REACT_APP_BACKEND_URL добавлен"
+        echo "REACT_APP_BACKEND_URL=http://$SERVER_IP:8001/api" >> "$INSTALL_DIR/frontend/.env"
     fi
+    
+    print_success "REACT_APP_BACKEND_URL обновлён на http://$SERVER_IP:8001/api"
 else
     print_warning "Frontend .env не найден, создаём..."
     cat > "$INSTALL_DIR/frontend/.env" << EOF
-REACT_APP_BACKEND_URL=http://$SERVER_IP:8001
+REACT_APP_BACKEND_URL=http://$SERVER_IP:8001/api
 EOF
     print_success "Frontend .env создан"
 fi
