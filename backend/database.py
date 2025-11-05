@@ -88,6 +88,9 @@ class Node(Base):
     scamalytics_fraud_score = Column(Integer, nullable=True, default=None)  # Fraud score 0-100
     scamalytics_risk = Column(String(20), nullable=True, default=None)  # Risk level: low, medium, high
     
+    # Geolocation coordinates
+    coordinates = Column(String(50), nullable=True, default=None)  # Format: "latitude,longitude" e.g. "37.3860,-122.0838"
+    
     last_check = Column(DateTime, nullable=True)
     last_update = Column(DateTime, nullable=True)  # Explicitly set in Python code, not by DB
     created_at = Column(DateTime, server_default=func.now())
