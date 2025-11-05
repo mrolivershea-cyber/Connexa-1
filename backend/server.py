@@ -3691,9 +3691,10 @@ async def manual_ping_light_test_batch_progress(
     if test_request.ping_timeouts and len(test_request.ping_timeouts) > 0:
         ping_light_timeout = test_request.ping_timeouts[0]
     
-    asyncio.create_task(process_ping_light_batches(
+    # Запускаем через threading (как GEO/Fraud тесты)
+    run_async_in_thread(process_ping_light_batches(
         session_id, [n.id for n in nodes], db,
-        ping_concurrency=test_request.ping_concurrency or 20,  # Еще выше для PING LIGHT
+        ping_concurrency=test_request.ping_concurrency or 20,
         timeout=ping_light_timeout
     ))
     
