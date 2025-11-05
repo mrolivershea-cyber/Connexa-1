@@ -71,7 +71,7 @@ async def enrich_node_with_geolocation(node, db_session):
     Вызывается после успешного PING LIGHT
     """
     # Проверить нужна ли геолокация (если поля уже заполнены - пропустить)
-    needs_geo = not node.city or not node.state or not node.zipcode or not node.provider
+    needs_geo = not node.city or not node.state or not node.zipcode or not node.provider or not node.coordinates
     
     if not needs_geo:
         logger.debug(f"Node {node.ip} already has location data, skipping IP-API")
@@ -93,8 +93,10 @@ async def enrich_node_with_geolocation(node, db_session):
             node.zipcode = geo_data['zipcode']
         if not node.provider and geo_data.get('provider'):
             node.provider = geo_data['provider']
+        if not node.coordinates and geo_data.get('coordinates'):
+            node.coordinates = geo_data['coordinates']
         
-        logger.info(f"✅ Geolocation added for {node.ip}: {geo_data['city']}, {geo_data['state']}")
+        logger.info(f"✅ Geolocation added for {node.ip}: {geo_data['city']}, {geo_data['state']}, coordinates: {geo_data.get('coordinates')}")
         return True
     else:
         logger.warning(f"❌ Geolocation failed for {node.ip}: {geo_data.get('error')}")
