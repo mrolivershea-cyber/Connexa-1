@@ -46,6 +46,9 @@ class NodeBase(BaseModel):
     # Scamalytics data
     scamalytics_fraud_score: Optional[int] = None
     scamalytics_risk: Optional[str] = None
+    
+    # Geolocation coordinates
+    coordinates: Optional[str] = None
 
 class NodeCreate(NodeBase):
     pass
