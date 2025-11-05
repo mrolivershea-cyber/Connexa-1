@@ -3893,18 +3893,35 @@ async def process_geo_fraud_test_background(session_id: str, node_ids: list, db_
                 if not node:
                     continue
                 
-                # Обновляем прогресс
-                if session_id in progress_store:
-                    progress_store[session_id].update(i, f"Полная проверка {node.ip} ({i}/{len(node_ids)})")
-                
                 # Выполняем полную проверку
                 success = await service_manager.enrich_node_complete(node, local_db)
                 
                 if success:
                     local_db.commit()
                 
+                # Добавляем результат в progress tracker
+                result = {
+                    "node_id": node.id,
+                    "ip": node.ip,
+                    "success": success,
+                    "status": f"GEO: {node.country}, {node.city} | Fraud Score: {node.scamalytics_fraud_score}, Risk: {node.scamalytics_risk}" if success else "Full check failed"
+                }
+                
+                # Обновляем прогресс с результатом
+                if session_id in progress_store:
+                    progress_store[session_id].update(i, f"Полная проверка {node.ip} ({i}/{len(node_ids)})", add_result=result)
+                
             except Exception as e:
                 logger.error(f"GEO+Fraud test error for node {node_id}: {e}")
+                # Добавляем ошибку в результаты
+                if session_id in progress_store:
+                    error_result = {
+                        "node_id": node_id,
+                        "ip": node.ip if node else "Unknown",
+                        "success": False,
+                        "status": f"Error: {str(e)}"
+                    }
+                    progress_store[session_id].update(i, f"Полная проверка ошибка ({i}/{len(node_ids)})", add_result=error_result)
         
         # Завершаем
         if session_id in progress_store:
