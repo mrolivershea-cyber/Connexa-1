@@ -3705,8 +3705,9 @@ async def manual_geo_test_batch(
     tracker = ProgressTracker(session_id, len(node_ids))
     progress_store[session_id] = tracker
     
-    # Запускаем в background
-    asyncio.create_task(process_geo_test_background(session_id, node_ids, db))
+    # Запускаем в background с правильной обработкой
+    task = asyncio.create_task(process_geo_test_background(session_id, node_ids, None))
+    logger.info(f"🚀 Created geo test background task for session {session_id}")
     
     return {
         "session_id": session_id,
