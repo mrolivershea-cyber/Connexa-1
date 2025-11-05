@@ -15,7 +15,7 @@ _min_interval = 1.4  # секунды между запросами
 async def get_ip_geolocation(ip: str) -> dict:
     """
     Получить геолокацию через ip-api.com
-    Возвращает: city, state, zip, provider, country
+    Возвращает: city, state, zip, provider, country, coordinates
     """
     global _last_request_time
     
@@ -26,7 +26,8 @@ async def get_ip_geolocation(ip: str) -> dict:
         await asyncio.sleep(_min_interval - time_since_last)
     
     try:
-        url = f"http://ip-api.com/json/{ip}?fields=status,message,country,regionName,city,zip,isp"
+        # Добавляем lat,lon в запрос для получения координат
+        url = f"http://ip-api.com/json/{ip}?fields=status,message,country,regionName,city,zip,isp,lat,lon"
         
         async with aiohttp.ClientSession() as session:
             async with session.get(url, timeout=aiohttp.ClientTimeout(total=5)) as response:
@@ -36,13 +37,19 @@ async def get_ip_geolocation(ip: str) -> dict:
                     data = await response.json()
                     
                     if data.get('status') == 'success':
+                        # Формируем координаты в формате "latitude,longitude"
+                        lat = data.get('lat')
+                        lon = data.get('lon')
+                        coordinates = f"{lat},{lon}" if lat is not None and lon is not None else None
+                        
                         return {
                             'success': True,
                             'country': data.get('country', ''),
                             'state': data.get('regionName', ''),  # regionName = штат
                             'city': data.get('city', ''),
                             'zipcode': data.get('zip', ''),
-                            'provider': data.get('isp', '')  # ISP = провайдер
+                            'provider': data.get('isp', ''),  # ISP = провайдер
+                            'coordinates': coordinates  # Новое поле с координатами
                         }
                     else:
                         logger.warning(f"IP-API failed for {ip}: {data.get('message')}")
