@@ -95,6 +95,9 @@ class Node(NodeBase):
     # OVPN Configuration
     ovpn_config: Optional[str] = None
     
+    # Geolocation coordinates
+    coordinates: Optional[str] = None
+    
     class Config:
         from_attributes = True
 
