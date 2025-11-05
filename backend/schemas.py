@@ -76,6 +76,9 @@ class NodeUpdate(BaseModel):
     
     # OVPN Configuration
     ovpn_config: Optional[str] = None
+    
+    # Geolocation coordinates
+    coordinates: Optional[str] = None
 
 class Node(NodeBase):
     id: int
