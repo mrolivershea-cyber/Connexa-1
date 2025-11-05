@@ -3799,6 +3799,7 @@ async def manual_fraud_test_batch(
 
 async def process_fraud_test_background(session_id: str, node_ids: list, db_session):
     """Background обработка Fraud теста с прогрессом"""
+    logger.info(f"🚀 Starting fraud test background task for session {session_id}, nodes: {node_ids}")
     local_db = SessionLocal()
     
     try:
@@ -3806,12 +3807,15 @@ async def process_fraud_test_background(session_id: str, node_ids: list, db_sess
         
         for i, node_id in enumerate(node_ids, 1):
             try:
+                logger.info(f"🔍 Processing node {node_id} ({i}/{len(node_ids)})")
                 node = local_db.query(Node).filter(Node.id == node_id).first()
                 if not node:
+                    logger.warning(f"❌ Node {node_id} not found")
                     continue
                 
                 # Выполняем проверку
                 success = await service_manager.enrich_node_fraud(node, local_db, force=True)
+                logger.info(f"✅ Fraud check for {node.ip}: success={success}, score={node.scamalytics_fraud_score}, risk={node.scamalytics_risk}")
                 
                 if success:
                     local_db.commit()
@@ -3827,9 +3831,10 @@ async def process_fraud_test_background(session_id: str, node_ids: list, db_sess
                 # Обновляем прогресс с результатом
                 if session_id in progress_store:
                     progress_store[session_id].update(i, f"Fraud проверка {node.ip} ({i}/{len(node_ids)})", add_result=result)
+                    logger.info(f"📊 Progress updated: {i}/{len(node_ids)}, results count: {len(progress_store[session_id].results)}")
                 
             except Exception as e:
-                logger.error(f"Fraud test error for node {node_id}: {e}")
+                logger.error(f"Fraud test error for node {node_id}: {e}", exc_info=True)
                 # Добавляем ошибку в результаты
                 if session_id in progress_store:
                     error_result = {
@@ -3842,14 +3847,16 @@ async def process_fraud_test_background(session_id: str, node_ids: list, db_sess
         
         # Завершаем
         if session_id in progress_store:
+            logger.info(f"✅ Fraud test completed. Total results: {len(progress_store[session_id].results)}")
             progress_store[session_id].complete("completed")
         
     except Exception as e:
-        logger.error(f"Fraud background task error: {e}")
+        logger.error(f"Fraud background task error: {e}", exc_info=True)
         if session_id in progress_store:
             progress_store[session_id].complete("failed")
     finally:
         local_db.close()
+        logger.info(f"🏁 Fraud test background task finished for session {session_id}")
 
 @api_router.post("/manual/geo-fraud-test-batch")
 async def manual_geo_fraud_test_batch(
