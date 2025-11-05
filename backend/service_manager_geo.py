@@ -160,8 +160,8 @@ class ServiceManager:
             db_session: Database session
             force: Если True - проверяет ВСЕГДА, даже если данные есть
         """
-        # Принудительная проверка или только если данных нет
-        needs_geo = force or (not node.city or not node.state or not node.zipcode)
+        # Принудительная проверка или только если данных нет (включая coordinates)
+        needs_geo = force or (not node.city or not node.state or not node.zipcode or not node.coordinates)
         
         if not needs_geo:
             return False
@@ -180,6 +180,8 @@ class ServiceManager:
                 node.zipcode = result.get('zipcode', '')
             if force or not node.provider:
                 node.provider = result.get('provider', '')
+            if force or not node.coordinates:
+                node.coordinates = result.get('coordinates', '')
             return True
         return False
     
