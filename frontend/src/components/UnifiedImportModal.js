@@ -250,12 +250,21 @@ const UnifiedImportModal = ({ isOpen, onClose, onComplete }) => {
       setPreviewResult(report || null);
       setShowPreview(true);
 
-      // Save report to localStorage for recovery
+      // Save MINIMAL report to localStorage (БЕЗ больших массивов)
       if (report) {
-        localStorage.setItem('lastImportReport', JSON.stringify({
-          report: report,
-          timestamp: Date.now()
-        }));
+        try {
+          const minimalReport = {
+            added: report.added || 0,
+            skipped_duplicates: report.skipped_duplicates || 0,
+            errors: report.errors?.length || 0,
+            timestamp: Date.now()
+            // НЕ сохраняем большие массивы типа nodes, results и т.д.
+          };
+          localStorage.setItem('lastImportReport', JSON.stringify(minimalReport));
+        } catch (storageError) {
+          console.warn('Failed to save to localStorage (quota exceeded?):', storageError.message);
+          // Продолжаем работу даже если localStorage переполнен
+        }
       }
 
       toast.success(`✅ Импорт завершён: ${report?.added || 0} добавлено, ${report?.skipped_duplicates || 0} дубликатов`);
@@ -269,6 +278,7 @@ const UnifiedImportModal = ({ isOpen, onClose, onComplete }) => {
           }, 100);
         } catch (error) {
           console.error('Error in onComplete callback:', error);
+          // Не прерываем работу при ошибке в callback
         }
       }
       
