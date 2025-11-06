@@ -551,10 +551,7 @@ auth ${node.login}
                         <Button 
                           size="sm" 
                           variant="ghost" 
-                          onClick={() => {
-                            navigator.clipboard.writeText(node.coordinates);
-                            toast.success('Координаты скопированы!');
-                          }}
+                          onClick={() => copyToClipboard(node.coordinates, 'Координаты')}
                           className="h-5 w-5 p-0"
                           title="Копировать координаты"
                         >
