@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { Settings, Lock, Bell } from 'lucide-react';
 
-const OptionsModal = ({ isOpen, onClose }) => {
+const OptionsModal = ({ isOpen, onClose, mustChangePassword = false, onPasswordChanged }) => {
   const { changePassword, API, token } = useAuth();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('password');
