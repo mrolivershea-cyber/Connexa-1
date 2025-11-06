@@ -99,7 +99,7 @@ const AdminPanel = () => {
       
       const response = await axios.get(`${API}/nodes`, { params });
       
-      // Batch state updates together
+      // Batch state updates together - используем startTransition для больших данных
       React.startTransition(() => {
         setNodes(response.data.nodes);
         setCurrentPage(response.data.page);
@@ -109,7 +109,13 @@ const AdminPanel = () => {
       console.log(`✅ Loaded ${response.data.nodes.length} nodes successfully`);
     } catch (error) {
       console.error('❌ Error loading nodes:', error);
-      toast.error('Failed to load nodes');
+      
+      // КРИТИЧНО: НЕ показывать toast при больших импортах (может вызвать reload)
+      if (error.message !== 'Network Error') {
+        toast.error('Failed to load nodes');
+      }
+      
+      // НЕ прерываем работу при ошибке загрузки
     } finally {
       setLoading(false);
     }
