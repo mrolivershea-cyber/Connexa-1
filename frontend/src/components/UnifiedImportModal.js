@@ -349,11 +349,18 @@ const UnifiedImportModal = ({ isOpen, onClose, onComplete }) => {
             setPreviewResult(report);
             setShowPreview(true);
             
-            // Save report to localStorage for recovery
-            localStorage.setItem('lastImportReport', JSON.stringify({
-              report: report,
-              timestamp: Date.now()
-            }));
+            // Save MINIMAL report to localStorage
+            try {
+              const minimalReport = {
+                added: progressData.added || 0,
+                skipped: progressData.skipped || 0,
+                errors: progressData.errors || 0,
+                timestamp: Date.now()
+              };
+              localStorage.setItem('lastImportReport', JSON.stringify(minimalReport));
+            } catch (storageError) {
+              console.warn('localStorage quota exceeded - skipping save:', storageError.message);
+            }
             
             toast.success(`✅ Импорт большого файла завершён: ${progressData.added} добавлено, ${progressData.skipped} дубликатов`);
           toast.info('📊 Для тестирования используйте кнопку "Testing" в админ-панели');
