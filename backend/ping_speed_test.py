@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 """
+⚠️ CRITICAL FILE - DO NOT DELETE! ⚠️
+Этот файл ОБЯЗАТЕЛЕН для работы Ping Light, Ping OK и Speed Test!
+Удаление приведет к ошибке: ModuleNotFoundError: No module named 'ping_speed_test'
+
 Real PPTP Ping and Speed Testing Implementation
 + Fast multi-port TCP reachability (service-aware, no protocol handshake)
 """
