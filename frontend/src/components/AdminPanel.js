@@ -45,6 +45,9 @@ const AdminPanel = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   
+  // Принудительная смена пароля при первом входе
+  const [mustChangePassword, setMustChangePassword] = useState(false);
+  
   // Modals
   const [showImportModal, setShowImportModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
