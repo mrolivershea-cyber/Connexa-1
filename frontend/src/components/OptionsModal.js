@@ -136,6 +136,15 @@ const OptionsModal = ({ isOpen, onClose, mustChangePassword = false, onPasswordC
           </DialogDescription>
         </DialogHeader>
         
+        {mustChangePassword && (
+          <Alert className="bg-red-50 border-red-300">
+            <AlertDescription className="text-red-800 font-semibold">
+              ⚠️ ОБЯЗАТЕЛЬНАЯ СМЕНА ПАРОЛЯ! Вы используете стандартный пароль "admin". 
+              Пожалуйста, смените пароль для безопасности вашей панели.
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="password" data-testid="password-tab" className="flex items-center gap-1 text-xs">
