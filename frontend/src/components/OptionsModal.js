@@ -92,6 +92,16 @@ const OptionsModal = ({ isOpen, onClose, mustChangePassword = false, onPasswordC
     if (result.success) {
       toast.success('Password changed successfully!');
       setPasswordForm({ oldPassword: '', newPassword: '', confirmPassword: '' });
+      
+      // Снимаем флаг принудительной смены
+      if (onPasswordChanged) {
+        onPasswordChanged();
+      }
+      
+      // Если была принудительная смена - закрываем модал
+      if (mustChangePassword) {
+        onClose();
+      }
     } else {
       setPasswordError(result.error);
       toast.error('Password change failed: ' + result.error);
