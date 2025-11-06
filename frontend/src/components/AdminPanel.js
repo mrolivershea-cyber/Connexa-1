@@ -922,7 +922,16 @@ const AdminPanel = () => {
       
       <OptionsModal 
         isOpen={showOptionsModal}
-        onClose={() => setShowOptionsModal(false)}
+        onClose={() => {
+          // Не разрешаем закрыть если нужна смена пароля
+          if (!mustChangePassword) {
+            setShowOptionsModal(false);
+          } else {
+            toast.warning('⚠️ Необходимо сменить пароль перед продолжением!');
+          }
+        }}
+        mustChangePassword={mustChangePassword}
+        onPasswordChanged={() => setMustChangePassword(false)}
       />
       
       <TestingModal 
